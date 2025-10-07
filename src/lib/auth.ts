@@ -32,16 +32,9 @@ export async function getSession() {
 
 export async function setAuthCookie(token: string) {
   const cookieStore = await cookies();
-  // Allow overriding the secure flag via AUTH_COOKIE_SECURE env var.
-  // If not provided, default to secure in production (original behavior).
-  const secureFlag =
-    typeof process.env.AUTH_COOKIE_SECURE !== 'undefined'
-      ? String(process.env.AUTH_COOKIE_SECURE).toLowerCase() === 'true'
-      : process.env.NODE_ENV === 'production';
-
   cookieStore.set('auth-token', token, {
     httpOnly: true,
-    secure: secureFlag,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 60 * 60 * 24 * 7, // 7 days
     path: '/',
@@ -50,18 +43,7 @@ export async function setAuthCookie(token: string) {
 
 export async function clearAuthCookie() {
   const cookieStore = await cookies();
-  // Delete cookie on the same path it was set to ensure it is removed in browsers.
-  try {
-    cookieStore.delete('auth-token');
-  } catch (e) {
-    // Some Next versions accept options for delete; attempt a path-based delete as a fallback.
-    try {
-      // @ts-expect-error - runtime option in some versions
-      cookieStore.delete('auth-token', { path: '/' });
-    } catch (_err) {
-      // swallow - best effort delete
-    }
-  }
+  cookieStore.delete('auth-token');
 }
 
 export async function requireAuth(request: NextRequest) {
