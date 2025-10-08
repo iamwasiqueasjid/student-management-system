@@ -10,6 +10,20 @@ const nextConfig = {
   images: {
     domains: ['localhost'],
   },
+  // Add headers for better cookie handling
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

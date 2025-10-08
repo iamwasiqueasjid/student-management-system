@@ -34,11 +34,11 @@ export async function setAuthCookie(token: string) {
   const cookieStore = await cookies();
 
   // Allow overriding the secure flag via AUTH_COOKIE_SECURE env var.
-  // If not provided, default to secure in production (original behavior).
+  // If not provided, default to secure in production only if HTTPS is available
   const secureFlag =
     typeof process.env.AUTH_COOKIE_SECURE !== 'undefined'
       ? String(process.env.AUTH_COOKIE_SECURE).toLowerCase() === 'true'
-      : process.env.NODE_ENV === 'production';
+      : process.env.NODE_ENV === 'production' && process.env.NEXTAUTH_URL?.startsWith('https://');
 
   cookieStore.set('auth-token', token, {
     httpOnly: true,
@@ -46,6 +46,8 @@ export async function setAuthCookie(token: string) {
     sameSite: 'lax',
     maxAge: 60 * 60 * 24 * 7, // 7 days
     path: '/',
+    // Add domain if specified in environment
+    ...(process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN }),
   });
 }
 

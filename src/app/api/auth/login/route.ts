@@ -54,8 +54,17 @@ export async function POST(request: NextRequest) {
       approved: user.approved,
     });
 
+    console.log('Login - Environment:', {
+      nodeEnv: process.env.NODE_ENV,
+      authCookieSecure: process.env.AUTH_COOKIE_SECURE,
+      nextAuthUrl: process.env.NEXTAUTH_URL,
+      cookieDomain: process.env.COOKIE_DOMAIN,
+    });
+
     // Set cookie
     await setAuthCookie(token);
+
+    console.log('Login successful for user:', user.email, 'Role:', user.role);
 
     return NextResponse.json({
       message: 'Login successful',
