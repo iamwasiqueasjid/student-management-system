@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import { connectDB } from '@/lib/mongodb';
 import Course from '@/models/Course';
 import { requireAuth } from '@/lib/auth';
